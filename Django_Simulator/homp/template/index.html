@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+
+<!--------------------- NAME 설정
+어종선택 fish_species
+시작 날짜 train_start
+마지막 날짜 train_end
+예측기간 predict_period
+모델 선택 select_model
+앙상블 비율 ratio
+
+lstm에포크 lstm_epoches
+lstm원도우 사이즈 lstm_windowsize
+lstm유닛 lstm_units
+lstm배치사이즈 lstm_batchsize
+
+gru에포크 gru_epoches
+gru원도우 사이즈 gru_windowsize
+gru유닛 gru_units
+gru배치사이즈 gru_batchsize
+
+rmse평가점수 rmse
+------------------------------>
+
+
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <title>WW_BITCAMP</title>
+    <link href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css" rel="stylesheet" />
+    <link href="static/css/styles.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js"
+        crossorigin="anonymous"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+
+<body class="sb-nav-fixed">
+    <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
+        <!-- Navbar Brand-->
+        <a class="navbar-brand ps-3" href="./">해양수산데이터연구소</a>
+        <!-- Sidebar Toggle-->
+        <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!"><i
+                class="fas fa-bars"></i></button>
+        <!-- Navbar Search-->
+        <form class="d-none d-md-inline-block form-inline ms-auto me-0 me-md-3 my-2 my-md-0">
+            <div class="input-group">
+                <input class="form-control" type="text" placeholder="Search for..." aria-label="Search for..."
+                    aria-describedby="btnNavbarSearch" />
+                <button class="btn btn-primary" id="btnNavbarSearch" type="button"><i
+                        class="fas fa-search"></i></button>
+            </div>
+        </form>
+        <!-- Navbar-->
+        <ul class="navbar-nav ms-auto ms-md-0 me-3 me-lg-4">
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown"
+                    aria-expanded="false"><i class="fas fa-user fa-fw"></i></a>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                    <li><a class="dropdown-item" href="#!">Settings</a></li>
+                    <li><a class="dropdown-item" href="#!">Activity Log</a></li>
+                    <li>
+                        <hr class="dropdown-divider" />
+                    </li>
+                    <li><a class="dropdown-item" href="#!">Logout</a></li>
+                </ul>
+            </li>
+        </ul>
+    </nav>
+    <div id="layoutSidenav">
+        <div id="layoutSidenav_nav">
+            <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
+                <div class="sb-sidenav-menu">
+                    <div class="nav">
+                        <div class="sb-sidenav-menu-heading">예측 단가</div>
+                        <a class="nav-link" href="./">
+                            <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                            수산물 수입단가<br>예측 시뮬레이터
+                        </a>
+                        <div class="sb-sidenav-menu-heading">시각화 분석</div>
+                        <a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
+                            data-bs-target="#collapseLayouts" aria-expanded="false" aria-controls="collapseLayouts">
+                            <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
+                            P0WER BI
+                            <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                        </a>
+                        <div class="collapse" id="collapseLayouts" aria-labelledby="headingOne"
+                            data-bs-parent="#sidenavAccordion">
+                            <nav class="sb-sidenav-menu-nested nav">
+                                <a class="nav-link" href="layout-static.html">서울/경기도</a>
+                                <a class="nav-link" href="layout-sidenav-light.html">그 외</a>
+                            </nav>
+                        </div>
+                        <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapsePages"
+                            aria-expanded="false" aria-controls="collapsePages">
+                            <div class="sb-nav-link-icon"><i class="fas fa-book-open"></i></div>
+                            Tableau
+                            <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                        </a>
+                        <div class="collapse" id="collapsePages" aria-labelledby="headingTwo"
+                            data-bs-parent="#sidenavAccordion">
+                            <nav class="sb-sidenav-menu-nested nav accordion" id="sidenavAccordionPages">
+                                <a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
+                                    data-bs-target="#pagesCollapseAuth" aria-expanded="false"
+                                    aria-controls="pagesCollapseAuth">
+                                    수입동향
+                                    <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                                </a>
+                                <div class="collapse" id="pagesCollapseAuth" aria-labelledby="headingOne"
+                                    data-bs-parent="#sidenavAccordionPages">
+                                    <nav class="sb-sidenav-menu-nested nav">
+                                        <a class="nav-link" href="login.html">Login</a>
+                                        <a class="nav-link" href="register.html">Register</a>
+                                        <a class="nav-link" href="password.html">Forgot Password</a>
+                                    </nav>
+                                </div>
+                                <a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
+                                    data-bs-target="#pagesCollapseError" aria-expanded="false"
+                                    aria-controls="pagesCollapseError">
+                                    Error
+                                    <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                                </a>
+                                <div class="collapse" id="pagesCollapseError" aria-labelledby="headingOne"
+                                    data-bs-parent="#sidenavAccordionPages">
+                                    <nav class="sb-sidenav-menu-nested nav">
+                                        <a class="nav-link" href="401.html">401 Page</a>
+                                        <a class="nav-link" href="404.html">404 Page</a>
+                                        <a class="nav-link" href="500.html">500 Page</a>
+                                    </nav>
+                                </div>
+                            </nav>
+                        </div>
+                        <div class="sb-sidenav-menu-heading">데이터 전처리</div>
+                        <a class="nav-link" href="charts.html">
+                            <div class="sb-nav-link-icon"><i class="fas fa-chart-area"></i></div>
+                            내부 데이터
+                        </a>
+                        <a class="nav-link" href="tables.html">
+                            <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
+                            외부 데이터
+                        </a>
+                    </div>
+                </div>
+                <div class="sb-sidenav-footer">
+
+                </div>
+            </nav>
+        </div>
+
+        <div id="layoutSidenav_content">
+            <main style="background-color: rgba(160, 160, 160, 0.1);">
+                <div class='container-fluid'>
+                    <div class='row'>
+                        <form class='col-md-6 py-3 pl-3 pr-1 dl-form' method="POST" action="">{% csrf_token %}
+
+                            <div class="w-100 border p-3 bg-white">
+                                <h3 class='d-flex justify-content-around mb-3' style="font-weight: bold" ;>수산물 수입단가 예측
+                                    시뮬레이터</h3>
+                                <div class=' row mb-3'>
+                                    <div class='col-12 mb-3 d-flex flex-column'>
+                                        <label for="validationCustom01"
+                                            style="font-weight: bold; background-color:#D8E6F7" class="form-label">어종
+                                            선택</label>
+                                        <select class=" form-select fish_species" name="fish_species"
+                                            aria-label="Default select example">
+                                            <option value="salmon" selected>연어</option>
+                                            <option value="squid">오징어</option>
+                                            <option value="shrimp">흰다리새우</option>
+                                        </select>
+                                    </div>
+
+                                    <div class='col-12 d-flex flex-column'>
+                                        <label for="validationCustom01"
+                                            style="font-weight: bold; background-color:#D8E6F7" class="form-label ">학습기간
+                                            선택 (2016년 7월 ~ 2020년 12월 선택가능)</label>
+                                        <div class="d-flex align-items-center">
+                                            <div class="input-group">
+                                                <input type="month" name="train_start" class="form-control train_start"
+                                                    value="2016-07">
+                                            </div>
+                                            <div>&nbsp;~&nbsp;</div>
+                                            <div class="input-group">
+                                                <input type="month" name="train_end" class="form-control train_end"
+                                                    value="2020-12">
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                </div>
+
+                                <label for="validationCustom01" style="font-weight: bold; background-color:#D8E6F7"
+                                    class="form-label  d-flex flex-column ">예측
+                                    기간</label>
+
+
+                                <div class="d-flex justify-content-around mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input predict_period" type="radio"
+                                            name="predict_period" id="date1" value='1'>
+                                        <label class="form-check-label" for="date1">
+                                            1주
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input predict_period" type="radio"
+                                            name="predict_period" id="date2" value='4'>
+                                        <label class="form-check-label" for="date2">
+                                            4주
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input predict_period" type="radio"
+                                            name="predict_period" id="date1" value='12'>
+                                        <label class="form-check-label" for="date1">
+                                            12주
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input predict_period" type="radio"
+                                            name="predict_period" id="date1" value='24' checked>
+                                        <label class="form-check-label" for="date1">
+                                            24주
+                                        </label>
+                                    </div>
+                                </div>
+                                <label for="validationCustom01" style="font-weight: bold; background-color:#D8E6F7"
+                                    class="form-label  d-flex flex-column">모델
+                                    선택</label>
+
+
+                                <div class="d-flex justify-content-around mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input LSTM-GRU" type="radio" name="select_model"
+                                            id="model1" value='lstm'>
+                                        <label class="form-check-label" for="model1">
+                                            LSTM
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input LSTM-GRU" type="radio" name="select_model"
+                                            id="model2" value='gru'>
+                                        <label class="form-check-label" for="model2">
+                                            GRU
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input LSTM-GRU" type="radio" name="select_model"
+                                            id="model3" value='lstm_gru' checked>
+                                        <label class="form-check-label" for="model3">
+                                            LSTM + GRU
+                                        </label>
+                                    </div>
+
+                                </div>
+
+                                <div class='row mb-3'>
+                                    <div class='col-12'>
+                                        <label for="validationCustom01"
+                                            style="font-weight: bold; background-color:#D8E6F7" ;
+                                            class="form-label  d-flex flex-column">앙상블
+                                            비율 선택</label>
+                                        <select class="form-select ratio" name="ratio"
+                                            aria-label="Default select example">
+                                            <!-- 어종 선택시 앙상블 비율 디폴트 값 설정 -->
+                                            <!-- lstm : gru 임 -->
+                                            {% for i,j in ratio %}
+                                            {% if i == 2 %}
+                                            <option value="{{i}}_{{j}}" selected>{{i}} : {{j}}</option>
+                                            {% else %}
+                                            <option value="{{i}}_{{j}}">{{i}} : {{j}}</option>
+                                            {% endif %}
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+
+
+
+
+
+
+                                <label for="validationCustom01" style="font-weight: bold; background-color:#D8E6F7"
+                                    class="form-label  d-flex flex-column">LSTM 하이퍼
+                                    파라미터 설정</label>
+                                <div class='d-flex mb-3'>
+                                    <div class='col-6 px-1'>
+                                        <label for="validationCustom01" class="form-label">Epoches</label>
+                                        <input class="form-control lstm_epoches" name="lstm_epoches" type="number"
+                                            placeholder="500" aria-label="default input example" value="500">
+                                    </div>
+
+                                    <div class='col-6 px-1'>
+                                        <label for="validationCustom01" class="form-label">Window Size</label>
+                                        <input class="form-control lstm_windowsize" name="lstm_windowsize" type="number"
+                                            placeholder="52" aria-label="default input example" value="52">
+                                    </div>
+
+                                </div>
+                                <div class='d-flex mb-3'>
+                                    <div class='col-6 px-1'>
+                                        <label for="validationCustom01" class="form-label">Units</label>
+                                        <input class="form-control lstm_units" name="lstm_units" type="number"
+                                            placeholder="16" aria-label="default input example" value="16">
+                                    </div>
+
+                                    <div class='col-6 px-1 '>
+                                        <label for="validationCustom01" class="form-label">Batch Size</label>
+                                        <input class="form-control lstm_batchsize" name="lstm_batchsize" type="number"
+                                            placeholder="8" aria-label="default input example" value="8">
+                                    </div>
+
+                                </div>
+
+
+                                <!-- lstm gru 두개만들기 -->
+                                <label for="validationCustom01" style="font-weight: bold; background-color:#D8E6F7"
+                                    class="form-label  d-flex flex-column">GRU 하이퍼
+                                    파라미터 설정</label>
+                                <div class='d-flex mb-3'>
+                                    <div class='col-6 px-1'>
+                                        <label for="validationCustom01" class="form-label">Epoches</label>
+                                        <input class="form-control gru_epoches" name="gru_epoches" type="number"
+                                            placeholder="500" aria-label="default input example" value="500">
+                                    </div>
+
+                                    <div class='col-6 px-1'>
+                                        <label for="validationCustom01" class="form-label">Window Size</label>
+                                        <input class="form-control gru_windowsize" name="gru_windowsize" type="number"
+                                            placeholder="52" aria-label="default input example" value="52">
+                                    </div>
+
+                                </div>
+                                <div class='d-flex mb-3'>
+                                    <div class='col-6 px-1'>
+                                        <label for="validationCustom01" class="form-label">Units</label>
+                                        <input class="form-control gru_units" name="gru_units" type="number"
+                                            placeholder="64" aria-label="default input example" value="64">
+                                    </div>
+
+                                    <div class='col-6 px-1 '>
+                                        <label for="validationCustom01" class="form-label">Batch Size</label>
+                                        <input class="form-control gru_batchsize" name="gru_batchsize" type="number"
+                                            placeholder="64" aria-label="default input example" value="64">
+                                    </div>
+
+                                </div>
+                                <!--팝업창 띄우기 해야할 부분 -->
+                                {%if win_res%}
+                                <p>{{win_res}}</p>
+                                {% endif %}
+                                <div class='d-flex justify-content-around mb-3'>
+
+                                    <button type="submit" class="btn btn-secondary w-25 submit-btn"
+                                        style="background-color:cornflowerblue; color:white; font-weight: bold; ">실
+                                        행</button>
+                                    <button type="reset" class="btn reset btn-secondary w-25"
+                                        name="reset">Reset</button>
+                                </div>
+                            </div>
+
+                        </form>
+
+                        <div class='col-md-6 py-3 pl-1 pr-3 '>
+
+                            <div class=" w-100 border p-3 mb-3 bg-white">
+                                <label for="validationCustom01" style="font-weight: bold; background-color:#F7EFCC"
+                                    class="form-label d-flex flex-column">결과 출력 (그래프)</label>
+                                <!-- 차트js 들어갈곳 -->
+                                <canvas id="myChartOne" height="100"></canvas>
+
+
+
+                            </div>
+                            <div class="w-100 border p-3 bg-white mb-3" style="max-height: 180px; overflow-y: scroll; ">
+                                <table class="table table-striped Max-height 100%">
+                                    <label for="validationCustom01" style="font-weight: bold; background-color:#F7EFCC"
+                                        class="form-label d-flex flex-column">결과
+                                        출력 (예측 평균단가와 실제 평균단가)</label>
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">날짜</th>
+                                            <th scope="col">예측 평균단가</th>
+                                            <th scope="col">실제 평균단가</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="t_body">
+                                        {% if pred_dataset %}
+                                        {% for i,j,k in pred_dataset %}
+                                        <tr>
+                                            <th scope="row">{{ j }}</th>
+                                            <td>{{ i }}</td>
+                                            <td>{{ k }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                        {% else %}
+                                        <tr>
+                                            <th scope="row">yyyy-mm-dd</th>
+                                            <td>$/kg</td>
+                                            <td>$/kg</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row">yyyy-mm-dd</th>
+                                            <td>$/kg</td>
+                                            <td>$/kg</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row">yyyy-mm-dd</th>
+                                            <td>$/kg</td>
+                                            <td>$/kg</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row">yyyy-mm-dd</th>
+                                            <td>$/kg</td>
+                                            <td>$/kg</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row">yyyy-mm-dd</th>
+                                            <td>$/kg</td>
+                                            <td>$/kg</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row">yyyy-mm-dd</th>
+                                            <td>$/kg</td>
+                                            <td>$/kg</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row">yyyy-mm-dd</th>
+                                            <td>$/kg</td>
+                                            <td>$/kg</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row">yyyy-mm-dd</th>
+                                            <td>$/kg</td>
+                                            <td>$/kg</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row">yyyy-mm-dd</th>
+                                            <td>$/kg</td>
+                                            <td>$/kg</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row">yyyy-mm-dd</th>
+                                            <td>$/kg</td>
+                                            <td>$/kg</td>
+                                        </tr>
+
+                                        <tr>
+                                            <th scope="row">yyyy-mm-dd</th>
+                                            <td>$/kg</td>
+                                            <td>$/kg</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row">yyyy-mm-dd</th>
+                                            <td>$/kg</td>
+                                            <td>$/kg</td>
+                                        </tr>
+
+                                        <tr>
+                                            <th scope="row">yyyy-mm-dd</th>
+                                            <td>$/kg</td>
+                                            <td>$/kg</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row">yyyy-mm-dd</th>
+                                            <td>$/kg</td>
+                                            <td>$/kg</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row">yyyy-mm-dd</th>
+                                            <td>$/kg</td>
+                                            <td>$/kg</td>
+                                        </tr>
+                                        {% endif %}
+
+
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="w-100 border p-3 bg-white">
+                                <table class="table table-striped Max-width 100% overflow: scroll;">
+                                    <label for="validationCustom01"
+                                        style="font-weight: bold; background-color:whitesmoke"
+                                        class="form-label d-flex flex-column">설정값 출력</label>
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">설정값</th>
+                                            <th scope="col">Epoches</th>
+                                            <th scope="col">Window Size</th>
+                                            <th scope="col">Units</th>
+                                            <th scope="col">Batch Size</th>
+                                            <th scope="col">비율</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <th scope="row">LSTM</th>
+                                            <th>{{lstm_epoches}}</th>
+                                            <th>{{lstm_windowsize}}</th>
+                                            <th>{{lstm_units}}</th>
+                                            <th>{{lstm_batchsize}}</th>
+                                            <th>{{lstm_ratio}}</th>
+
+                                        </tr>
+                                        <tr>
+                                            <th scope="row">GRU</th>
+                                            <th>{{gru_epoches}}</th>
+                                            <th>{{gru_windowsize}}</th>
+                                            <th>{{gru_units}}</th>
+                                            <th>{{gru_batchsize}}</th>
+                                            <th>{{gru_ratio}}</th>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                            </div>
+                            <div class='w-100 border p-3 bg-white justify-content-around '>
+                                <label for="validationCustom01" style="font-weight: bold; background-color:whitesmoke"
+                                    class="form-label d-flex flex-column">RMSE
+                                    평가점수</label>
+                                <input class="form-control rmse" name="rmse" aria-label="default input example"
+                                    value={{rmse}}>
+                                <!--type = "number"-->
+                                <!-- {% if rmse %} placeholder="0에 가까울수록 좋은 모델입니다."
+                                <p>{{rmse}}</p>
+                                {% else %}
+                                <p>rmse점수가 낮을수록 좋은 예측모델입니다.</p>
+                                {% endif %}
+                                 -->
+                            </div>
+
+                            <div class='w-100 border p-3 bg-white d-flex justify-content-around mb-3 text-center'>
+                                {% if modelname %}
+                                <a href="/media/{{modelname}}" download type='button'
+                                    class="btn btn-secondary w-25 text-nowrap">모델 저장</a>
+                                {% else %}
+                                <button class="btn btn-secondary w-25 text-nowrap">모델 저장</button>
+                                {% endif %}
+
+                                <button class="btn btn-secondary w-25 text-nowrap">모델 불러오기</button>
+                                {% if filename %}
+                                <a href="/media/{{filename}}" download type='button'
+                                    class="btn btn-secondary w-25 text-nowrap">데이터 저장</a>
+                                {% else %}
+                                <button class="btn btn-secondary w-25 text-nowrap">데이터 저장</button>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+            </main>
+            <footer class="py-4 bg-light mt-auto">
+                <div class="container-fluid px-4">
+                    <div class="d-flex align-items-center justify-content-between small">
+                        <div class="text-muted">Copyright &copy; W_W 2021</div>
+
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"
+        crossorigin="anonymous"></script>
+    <script src="static/js/scripts.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" crossorigin="anonymous"></script>
+    <script src="assets/demo/chart-area-demo.js"></script>
+    <script src="assets/demo/chart-bar-demo.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/simple-datatables@latest" crossorigin="anonymous"></script>
+    <script src="js/datatables-simple-demo.js"></script>
+
+    <script>var predict_price = {{ pred_p_price| safe }};</script>
+    <script>var predict_dates = {{ pred_period| safe }};</script>
+    <script>var real_price = {{ real_p_price| safe }};</script>
+
+    <script>
+        // 그래프 출력, labels와 data , data
+
+        let myChartOne = document.getElementById('myChartOne').getContext('2d');
+        let lineChart = new Chart(myChartOne, {
+            type: 'line',
+
+
+
+
+
+            data: {
+                labels: predict_dates,
+                datasets: [{
+                    label: '예측 평균단가',
+                    data: predict_price,
+                    borderColor: 'orange',
+                    backgroundColor: 'orange',
+
+                    pointHoverBackgroundColor: 'red',
+                    pointHoverBorderColor: 'red',
+                    fill: false
+
+                },
+                {
+                    label: '실제 평균단가',
+                    data: real_price,
+                    borderColor: 'skyblue',
+                    backgroundColor: 'skyblue',
+                    pointHoverBackgroundColor: 'red',
+                    pointHoverBorderColor: 'red',
+                    fill: false
+                }],
+            },
+        });
+
+    </script>
+
+
+    <script>
+
+
+        $(function () {
+
+            $(".LSTM-GRU").change(function (e) {
+                if (e.target.value === 'lstm_gru') {
+                    $(".ratio").attr("disabled", false)
+                    $(".lstm_epoches").attr("disabled", false)
+                    $(".lstm_windowsize").attr("disabled", false)
+                    $(".lstm_units").attr("disabled", false)
+                    $(".lstm_batchsize").attr("disabled", false)
+                    $(".gru_epoches").attr("disabled", false)
+                    $(".gru_windowsize").attr("disabled", false)
+                    $(".gru_units").attr("disabled", false)
+                    $(".gru_batchsize").attr("disabled", false)
+                } else {
+                    $(".ratio").attr("disabled", true)
+                }
+
+            })
+            // LSTM, GRU 누르면 각각의 파라미터 설정만 되겟금 
+            $(".LSTM-GRU").change(function (e) {
+                if (e.target.value === 'gru') {
+                    $(".gru_epoches").attr("disabled", false)
+                    $(".gru_windowsize").attr("disabled", false)
+                    $(".gru_units").attr("disabled", false)
+                    $(".gru_batchsize").attr("disabled", false)
+                    $(".lstm_epoches").attr("disabled", true)
+                    $(".lstm_windowsize").attr("disabled", true)
+                    $(".lstm_units").attr("disabled", true)
+                    $(".lstm_batchsize").attr("disabled", true)
+
+                }
+            })
+            $(".LSTM-GRU").change(function (e) {
+                if (e.target.value === 'lstm') {
+                    $(".gru_epoches").attr("disabled", true)
+                    $(".gru_windowsize").attr("disabled", true)
+                    $(".gru_units").attr("disabled", true)
+                    $(".gru_batchsize").attr("disabled", true)
+                    $(".lstm_epoches").attr("disabled", false)
+                    $(".lstm_windowsize").attr("disabled", false)
+                    $(".lstm_units").attr("disabled", false)
+                    $(".lstm_batchsize").attr("disabled", false)
+
+                }
+            })
+
+            // 리셋시 다 활성화로 
+
+            $(".reset").click(function (e) {
+                {
+                    $(".ratio").attr("disabled", false)
+                    $(".gru_epoches").attr("disabled", false)
+                    $(".gru_windowsize").attr("disabled", false)
+                    $(".gru_units").attr("disabled", false)
+                    $(".gru_batchsize").attr("disabled", false)
+                    $(".lstm_epoches").attr("disabled", false)
+                    $(".lstm_windowsize").attr("disabled", false)
+                    $(".lstm_units").attr("disabled", false)
+                    $(".lstm_batchsize").attr("disabled", false)
+
+
+                }
+            })
+
+            // 어종선택시 디폴트값 바뀌게 
+
+            $(".fish_species").change(function (e) {
+                if (e.target.value === 'salmon') {
+                    $('.lstm_epoches').val("500")
+                    $('.lstm_windowsize').val("52")
+                    $('.lstm_units').val("16")
+                    $('.lstm_batchsize').val("8")
+                    $('.gru_epoches').val("500")
+                    $('.gru_windowsize').val("52")
+                    $('.gru_units').val("64")
+                    $('.gru_batchsize').val("64")
+                    $(".ratio").val("{{2}}_{{8}}")
+
+
+
+                }
+            })
+
+            $(".fish_species").change(function (e) {
+                if (e.target.value === 'squid') {
+                    $('.lstm_epoches').val("500")
+                    $('.lstm_windowsize').val("52")
+                    $('.lstm_units').val("64")
+                    $('.lstm_batchsize').val("4")
+                    $('.gru_epoches').val("500")
+                    $('.gru_windowsize').val("52")
+                    $('.gru_units').val("32")
+                    $('.gru_batchsize').val("4")
+                    $(".ratio").val("{{5}}_{{5}}")
+
+
+
+                }
+            })
+
+
+            $(".fish_species").change(function (e) {
+                if (e.target.value === 'shrimp') {
+                    $('.lstm_epoches').val("300")
+                    $('.lstm_windowsize').val("52")
+                    $('.lstm_units').val("64")
+                    $('.lstm_batchsize').val("64")
+                    $('.gru_epoches').val("300")
+                    $('.gru_windowsize').val("52")
+                    $('.gru_units').val("16")
+                    $('.gru_batchsize').val("16")
+                    $(".ratio").val("{{7}}_{{3}}")
+
+
+
+                }
+            })
+
+            // 각 하이퍼파라미터의 상한선(경고창만) 하한선(경고창과 디폴트로변경) 두기
+
+            $(".lstm_epoches").change(function (e) {
+                if (e.target.value <= '0') {
+                    $('.lstm_epoches').val("500")
+                    alert("학습횟수는 1 이상입니다. 다시 설정해주세요.")
+                }
+                else if (e.target.value >= 1000) {
+                    alert("값을 너무 높게 설정하지 않는 것을 추천드립니다.")
+
+
+                }
+
+            })
+
+            $(".gru_epoches").change(function (e) {
+                if (e.target.value <= '0') {
+                    $('.lstm_epoches').val("500")
+                    alert("학습횟수는 1 이상입니다. 다시 설정해주세요.")
+
+                }
+                else if (e.target.value > 1000) {
+                    alert("값을 너무 높게 설정하지 않는 것을 추천드립니다.")
+
+                }
+            })
+            $(".lstm_windowsize").change(function (e) {
+                if (e.target.value <= '0') {
+                    $('.lstm_windowsize').val("52")
+                    alert("윈도우사이즈는 1 이상입니다. 다시 설정해주세요.")
+
+                }
+                else if (e.target.value > 1000) {
+                    alert("값을 너무 높게 설정하지 않는 것을 추천드립니다.")
+
+                }
+            })
+            $(".gru_windowsize").change(function (e) {
+                if (e.target.value <= '0') {
+                    $('.gru_windowsize').val("52")
+                    alert("윈도우사이즈는 1 이상입니다. 다시 설정해주세요.")
+
+                }
+                else if (e.target.value > 1000) {
+                    alert("값을 너무 높게 설정하지 않는 것을 추천드립니다.")
+
+                }
+            })
+            $(".lstm_units").change(function (e) {
+                if (e.target.value <= '0') {
+                    $('.lstm_units').val("16")
+                    alert("유닛은 1 이상입니다. 다시 설정해주세요.")
+
+                }
+                else if (e.target.value > 1000) {
+                    alert("값을 너무 높게 설정하지 않는 것을 추천드립니다.")
+
+                }
+            })
+            $(".gru_units").change(function (e) {
+                if (e.target.value <= '0') {
+                    $('.gru_units').val("64")
+                    alert("유닛은 1 이상입니다. 다시 설정해주세요.")
+
+                }
+                else if (e.target.value > 1000) {
+                    alert("값을 너무 높게 설정하지 않는 것을 추천드립니다.")
+
+                }
+            })
+
+            $(".lstm_batchsize").change(function (e) {
+                if (e.target.value <= '0') {
+                    $('.lstm_batchsize').val("8")
+                    alert("배치사이즈는 1 이상입니다. 다시 설정해주세요.")
+
+                }
+                else if (e.target.value > 1000) {
+                    alert("값을 너무 높게 설정하지 않는 것을 추천드립니다.")
+
+                }
+            })
+
+            $(".gru_batchsize").change(function (e) {
+                if (e.target.value <= '0') {
+                    $('.gru_batchsize').val("64")
+                    alert("배치사이즈는 1 이상입니다. 다시 설정해주세요.")
+
+                }
+                else if (e.target.value > 1000) {
+                    alert("값을 너무 높게 설정하지 않는 것을 추천드립니다.")
+
+                }
+            })
+
+
+
+
+            $(".train_start").change(function (e) {
+                if (e.target.value <= '2016-07' | e.target.value >= '2021-01') {
+                    alert("학습 가능한 기간은 2016-07 ~ 2020-12 입니다. 다시 선택해주세요.")
+                    $('.train_start').val("2016-07");
+
+
+                }
+            })
+            $(".train_end").change(function (e) {
+                if (e.target.value <= '2016-07' | e.target.value >= '2021-01') {
+                    alert("학습 가능한 기간은 2016-07 ~ 2020-12 입니다. 다시 선택해주세요.")
+                    $('.train_end').val("2020-12");
+
+
+                }
+            })
+
+            // 시작날짜가 끝날짜보다 작게
+            $(".train_start").change(function (e) {
+                if (e.target.value >= $('.train_end').val()) {
+                    alert("시작일은 종료일보다 이전이어야 합니다. 다시 선택해주세요.")
+                    $('.train_start').val("2016-07");
+
+
+                }
+            })
+            $(".train_end").change(function (e) {
+                if (e.target.value <= $('.train_start').val()) {
+                    alert("종료일은 시작일보다 이후어야 합니다. 다시 선택해주세요.")
+                    $('.train_end').val("2020-12");
+
+
+                }
+            })
+
+
+            // window size는 학습 데이터 숫자보다 작아야함, 학습데이터수는 view 에서 불러와야됨 
+
+            // $(".lstm_windowsize").change(function (e) {
+            //     if (e.target.value >= 학습데이터수) {
+            //         $('.lstm_windowsize').val("52")
+            //         alert("윈도우사이즈는 학습데이터의 숫자보다 클 수 없습니다. 학습기간을 늘리거나 윈도우사이즈를 줄여주세요.")
+
+            //     }
+
+            // })
+
+            // $(".gru_windowsize").change(function (e) {
+            //     if (e.target.value >= 학습데이터수) {
+            //         $('.gru_windowsize').val("52")
+            //         alert("윈도우사이즈는 학습데이터의 숫자보다 클 수 없습니다. 학습기간을 늘리거나 윈도우사이즈를 줄여주세요.")
+
+            //     }
+
+            // })
+
+
+
+
+
+
+        })
+
+    </script>
+
+</body>
+
+</html>
