@@ -57,7 +57,9 @@
 
 - 딥러닝 프레임워크 : TensorFlow, Keras
 
-- 시계열 모델: Sarima, LSTM, GRU, XGBoost
+- 머신러닝 프레임워크 : Scikit-learn
+
+- 모델 비교 : Sarima, XGBoost, LSTM, GRU
 
 - 모델 검증 및 성능 향상 과정 : 하이퍼파라미터 튜닝, 앙상블 
 
