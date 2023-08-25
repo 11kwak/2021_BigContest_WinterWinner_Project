@@ -1,1 +1,0 @@
-/* 시뮬레이터_실행_시간(DATE12),어종(c10),학습시작날짜(DATE6),학습종료날짜(DATE6),예측기간(i2),    모델종류(c8),LSTM_Epoches(i4),LSTM_Window_Size(i4),LSTM_Units(i4),LSTM_Batch_Size(i4),    GRU_Epoches(i4),GRU_Window_Size(i4),GRU_Unit(i4),GRU_Batch_Size(i4),앙상블비율(LSTM:GRU)(c3),    RMSE스코어(f20) */2021-09-24 13:46,연어,2016-07,2020-12,24,ensemble,1,52,16,8,1,52,64,64,2:8,NULL
